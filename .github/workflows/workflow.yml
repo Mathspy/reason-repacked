@@ -1,0 +1,143 @@
+name: Main workflow
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Create Github Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+  build:
+    name: Build Reason artifacts
+    needs: [release]
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+        - os: macos-latest
+          NAME: darwin
+
+        - os: ubuntu-latest
+          NAME: linux
+
+        - os: windows-latest
+          NAME: win32
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Use OCaml 4.06.1
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: 4.06.1
+
+      - name: Build binary
+        if: runner.os != 'Windows'
+        run: |
+          eval $(opam env)
+          ocamlopt -g -I +compiler-libs -I ./ml -w -40-30-3 -no-alias-deps ocamlcommon.cmxa ./ml/refmt_main3.mli ./ml/refmt_main3.ml -o ./refmt.exe
+
+      - name: Build binary (oh why must you hate me so, Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: ocaml-env exec -- ocamlopt -g -I +compiler-libs -I ./ml -w -40-30-3 -no-alias-deps ocamlcommon.cmxa ./ml/refmt_main3.mli ./ml/refmt_main3.ml -o ./refmt
+
+      - name: Make it executable!
+        if: runner.os != 'Windows'
+        shell: bash
+        run: chmod +x ./refmt.exe
+
+      - name: version
+        shell: bash
+        run: ./refmt.exe --version
+
+      - name: checksum
+        shell: bash
+        run: if [ "$RUNNER_OS" = "macOS" ]; then shasum -a 256 ./refmt.exe; else sha256sum ./refmt.exe; fi
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ./refmt.exe
+          asset_name: refmt-${{ matrix.NAME }}.exe
+          asset_content_type: application/octet-stream
+
+  publish:
+    name: Publish new version!
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Download MacOS binary
+        uses: dsaltares/fetch-gh-release-asset@0.0.5
+        with:
+          version: ${{ steps.get_release.outputs.id }}
+          file: "refmt-darwin.exe"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Linux binary
+        uses: dsaltares/fetch-gh-release-asset@0.0.5
+        with:
+          version: ${{ steps.get_release.outputs.id }}
+          file: "refmt-linux.exe"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Windows binary
+        uses: dsaltares/fetch-gh-release-asset@0.0.5
+        with:
+          version: ${{ steps.get_release.outputs.id }}
+          file: "refmt-win32.exe"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move executables
+        run: mv refmt-darwin.exe refmt-linux.exe refmt-win32.exe ./reason-repacked
+
+      - name: Publish!
+        run: npm publish ./reason-repacked --dry-run
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
