@@ -1,0 +1,22 @@
+{
+  "name": "reason-repacked",
+  "version": "3.6.0-30fb3f5",
+  "description": "Just Reason repacked for BuckleScript usage",
+  "bin": {
+    "refmt": "refmt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mathspy/reason-repacked.git"
+  },
+  "keywords": [
+    "reason",
+    "bucklescript",
+    "let-bindings"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mathspy/reason-repacked/issues"
+  },
+  "homepage": "https://github.com/Mathspy/reason-repacked#readme"
+}
