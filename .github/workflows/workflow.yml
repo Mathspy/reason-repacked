@@ -134,10 +134,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Make them executable again!
+        run: sudo chmod +x refmt-darwin.exe refmt-linux.exe
+
       - name: Move executables
         run: mv refmt-darwin.exe refmt-linux.exe refmt-win32.exe ./reason-repacked
 
+      - name: Prepare .npmrc for publishing
+        run: echo "Ly9yZWdpc3RyeS5ucG1qcy5vcmcvOl9hdXRoVG9rZW49JHtOUE1fQVVUSF9UT0tFTn0KcmVnaXN0cnk9aHR0cHM6Ly9yZWdpc3RyeS5ucG1qcy5vcmcvCmFsd2F5cy1hdXRoPXRydWUK" | base64 -d | tee ./reason-repacked/.npmrc
+
       - name: Publish!
-        run: npm publish ./reason-repacked --dry-run
+        run: cd ./reason-repacked && npm publish
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

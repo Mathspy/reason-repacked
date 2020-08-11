@@ -1,6 +1,6 @@
 {
   "name": "reason-repacked",
-  "version": "3.6.0-30fb3f5",
+  "version": "3.6.0-30fb3f55",
   "description": "Just Reason repacked for BuckleScript usage",
   "bin": {
     "refmt": "refmt"
