@@ -1,0 +1,9 @@
+name: "Create Matrix"
+description: "Create a Matrix for Resonator"
+outputs:
+  matrix:
+    description: "The Matrix to pass to Resonator"
+
+runs:
+  using: node12
+  main: ./create_matrix.js
