@@ -1,0 +1,48 @@
+name: Resonator
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  prepare:
+    name: Preparing Resonator
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.create_matrix.outputs.matrix }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - id: create_matrix
+      uses: ./resonator/create_matrix
+
+  resonator:
+    name: Resonator
+    needs: [prepare]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ matrix.repo }}
+        ref: ${{ matrix.ref }}
+
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Switch to reason-repacked
+      run: "find . \\( -type d -name .git -prune \\) -o -type f -print0 | xargs -0 sed -i 's/\"refmt\": ?3/\"refmt\": \".\\/node_modules\\/.bin\\/refmt\"/g'"
+
+    - name: Install reason-repacked
+      run: npm install reason-repacked@rc
+
+    - name: Try building!
+      run: npm run build

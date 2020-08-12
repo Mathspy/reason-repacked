@@ -1,0 +1,12 @@
+{
+  "packages": [
+    {
+      "repo": "reazen/relude",
+      "ref": "master"
+    },
+    {
+      "repo": "reazen/relude",
+      "ref": "letops"
+    }
+  ]
+}
