@@ -1,7 +1,7 @@
 {
   "name": "reason-repacked",
   "version": "3.6.0-30fb3f55",
-  "description": "Just Reason repacked for BuckleScript usage",
+  "description": "Just Reason repacked for BuckleScript/ReScript usage",
   "bin": {
     "refmt": "refmt"
   },
@@ -12,6 +12,7 @@
   "keywords": [
     "reason",
     "bucklescript",
+    "rescript",
     "let-bindings"
   ],
   "license": "MIT",

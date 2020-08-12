@@ -1,8 +1,8 @@
 # reason-repacked
 
-This is just [Reason] repacked into a binary for easy use with BuckleScript.
+This is just [Reason] repacked into a binary for easy use with BuckleScript/ReScript.
 
-The goal is to have an always up-to-date distribution of [Reason] as BuckleScript ships with an often outdated version.
+The goal is to have an always up-to-date distribution of [Reason] as BuckleScript/ReScript ships with an often outdated version.
 
 ## Usage
 Run this in your project:
