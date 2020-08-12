@@ -144,6 +144,6 @@ jobs:
         run: echo "Ly9yZWdpc3RyeS5ucG1qcy5vcmcvOl9hdXRoVG9rZW49JHtOUE1fQVVUSF9UT0tFTn0KcmVnaXN0cnk9aHR0cHM6Ly9yZWdpc3RyeS5ucG1qcy5vcmcvCmFsd2F5cy1hdXRoPXRydWUK" | base64 -d | tee ./reason-repacked/.npmrc
 
       - name: Publish!
-        run: cd ./reason-repacked && npm publish
+        run: cd ./reason-repacked && npm publish --tag rc
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
