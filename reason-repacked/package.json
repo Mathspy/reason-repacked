@@ -5,6 +5,9 @@
   "bin": {
     "refmt": "refmt"
   },
+  "scripts": {
+    "postinstall": "node postinstall.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mathspy/reason-repacked.git"

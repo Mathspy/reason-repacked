@@ -1,16 +1,3 @@
-#!/usr/bin/env node
-"use strict";
-
-var child_process = require("child_process")
-var path = require("path")
-
-// the underlying binary is called refmt
-var exe = path.join(__dirname, "refmt-" + process.platform + ".exe")
-var delegate_args = process.argv.slice(2)
-
-try {
-    child_process.execFileSync(exe, delegate_args, { stdio: "inherit" })
-} catch (e) {
-    console.error("Error happened when running command", exe, "with args", delegate_args)
-    process.exit(2)
-}
+#!/usr/bin/bash
+# This file is meant to act as a useless executable that will be swapped during postinstall
+# This is required because npm will try to chmod +x refmt file
